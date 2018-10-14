@@ -13,9 +13,8 @@ import scala.util.{Failure, Success}
 
 class TokenRoles(enabled: Boolean, roles: Roles) {
   def hasAdminRole = if (enabled) roles.contains(ROLE_ADMIN) else true
-  def hasReadRole = if (enabled) Set(ROLE_ADMIN, ROLE_READ).subsetOf(roles) else true
-  def hasWriteRole = if (enabled) Set(ROLE_ADMIN, ROLE_WRITE).subsetOf(roles) else true
-  def hasReadWriteRole = if(enabled) allRoles.subsetOf(roles) else true
+  def hasReadRole = if (enabled) roles.contains(ROLE_READ) else true
+  def hasWriteRole = if (enabled) roles.contains(ROLE_WRITE) else true
 }
 
 object TokenRoles {

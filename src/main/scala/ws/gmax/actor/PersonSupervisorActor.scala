@@ -3,13 +3,16 @@ package ws.gmax.actor
 import akka.actor.{ActorRef, DeadLetter, Props, Terminated}
 import com.datastax.driver.core.Session
 import ws.gmax.model._
-import ws.gmax.repo.PersonRepo
+import ws.gmax.repo.{PersonRepo, PersonRepoCassandra, PersonRepoSlick}
 
-class PersonSupervisorActor(session: Session) extends AbstractSupervisorActor {
+class PersonSupervisorActor(session: Option[Session]) extends AbstractSupervisorActor {
 
   import context.dispatcher
 
-  val personRepo = PersonRepo(session)
+  val personRepo: PersonRepo = session match {
+    case Some(cassandraSession) => PersonRepoCassandra(cassandraSession)
+    case None => PersonRepoSlick(context.system.settings.config)
+  }
 
   /** Create actors */
   val personsActor: ActorRef = context.actorOf(PersonActor(personRepo), "personActor")
@@ -30,7 +33,7 @@ class PersonSupervisorActor(session: Session) extends AbstractSupervisorActor {
   override def receive: Receive = {
     case message: GetPersonRequest => personsActor forward message
 
-    case message @ GetPersonsRequest => personsActor forward message
+    case message@GetPersonsRequest => personsActor forward message
 
     case message: DeletePersonRequest => personsActor forward message
 
@@ -38,9 +41,9 @@ class PersonSupervisorActor(session: Session) extends AbstractSupervisorActor {
 
     case message: UpdatePersonRequest => personsActor forward message
 
-    case message: IssueJwtMessage => jwtActor forward  message
+    case message: IssueJwtMessage => jwtActor forward message
 
-    case message: VerifyJwtMessage => jwtActor forward  message
+    case message: VerifyJwtMessage => jwtActor forward message
 
     case DeadLetter(message, sender, recipient) =>
       log.warning(s"The $recipient is not able to process message $message received from $sender")
@@ -56,5 +59,5 @@ class PersonSupervisorActor(session: Session) extends AbstractSupervisorActor {
 }
 
 object PersonSupervisorActor {
-  def apply(session: Session): Props = Props(new PersonSupervisorActor(session))
+  def apply(session: Option[Session]): Props = Props(new PersonSupervisorActor(session))
 }

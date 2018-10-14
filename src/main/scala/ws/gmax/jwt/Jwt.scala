@@ -1,12 +1,8 @@
 package ws.gmax.jwt
 
-import java.util.concurrent.TimeUnit
-
 import com.typesafe.scalalogging.LazyLogging
 import pdi.jwt.{Jwt, JwtAlgorithm, JwtClaim}
 import spray.json._
-
-import scala.concurrent.duration.FiniteDuration
 
 case class AuthInfo(iss: String, sub: String, authorization: Option[Set[String]])
 

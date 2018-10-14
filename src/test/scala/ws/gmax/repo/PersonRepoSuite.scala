@@ -19,7 +19,7 @@ class PersonRepoSuite extends EmbeddedCassandra with AsyncFlatSpecLike with Befo
   override def beforeAll(): Unit = {
     val dataSet = new ClassPathCQLDataSet("movie-test.cql", true, true, "movie")
     cassandraSession = startUp(port = 9142, dataSet = Some(dataSet))
-    personRepo = PersonRepo(cassandraSession, isAsync = false)
+    personRepo = PersonRepoCassandra(cassandraSession, isAsync = false)
   }
 
   behavior of "PersonRepo"

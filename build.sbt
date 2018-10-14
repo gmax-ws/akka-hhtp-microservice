@@ -6,6 +6,8 @@ version := "0.1"
 
 scalaVersion := "2.12.7"
 
+mainClass in (Compile, run) := Some("ws.gmax.PersonServiceBoot")
+
 val akkaVersion = "2.5.17"
 val akkaHttpVersion = "10.1.5"
 val cassandraDriverVersion = "3.6.0"
@@ -15,6 +17,9 @@ val mockitoVersion = "1.10.19"
 val swaggerVersion = "1.0.0"
 val loggingVersion = "3.9.0"
 val jwtVersion = "0.18.0"
+val slickVersion = "3.2.3"
+val c3p0Version = "0.9.1.2"
+val h2DbVersion = "1.4.197"
 
 libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-http" % akkaHttpVersion,
@@ -27,8 +32,11 @@ libraryDependencies ++= Seq(
   "com.github.swagger-akka-http" %% "swagger-akka-http" % swaggerVersion,
   "com.typesafe.scala-logging" %% "scala-logging" % loggingVersion,
   "com.pauldijou" %% "jwt-core" % jwtVersion,
-  
-  "org.scalatest" %% "scalatest" % scalaTestVersion % Test,
+  "com.typesafe.slick" %% "slick" % slickVersion,
+  "c3p0" % "c3p0" % c3p0Version,
+  "com.h2database" % "h2" % h2DbVersion,
+
+"org.scalatest" %% "scalatest" % scalaTestVersion % Test,
   "com.typesafe.akka" %% "akka-testkit" % akkaVersion % Test,
   "com.typesafe.akka" %% "akka-stream-testkit" % akkaVersion % Test,
   "com.typesafe.akka" %% "akka-http-testkit" % akkaHttpVersion % Test,

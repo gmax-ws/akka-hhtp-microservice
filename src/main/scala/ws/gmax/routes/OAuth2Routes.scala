@@ -7,7 +7,7 @@ import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import spray.json.{DefaultJsonProtocol, RootJsonFormat}
-import ws.gmax.jwt.{AuthInfo, JwtToken}
+import ws.gmax.jwt.AuthInfo
 import ws.gmax.service.PersonService
 
 import scala.concurrent.duration.FiniteDuration
@@ -32,7 +32,6 @@ trait OAuth2Routes extends OAuth2Protocol {
   val scope = "person"
   val realm = "gmax"
   val clients = Set("admin", "user", "guest")
-
 
   val oauthRoutes: Route = pathPrefix("oauth") {
     path("access_token") {

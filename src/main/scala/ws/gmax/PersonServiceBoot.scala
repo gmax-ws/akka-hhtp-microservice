@@ -36,6 +36,7 @@ object Global {
   val port: Int = config.getInt("http-port")
   val withCorsFilter: Boolean = config.getBoolean("withCorsFilter")
   val localhostAuth: Boolean = config.getBoolean("localhostAuth")
+  val isNoSQL: Boolean = config.getBoolean("isNoSQL")
 }
 
 /** Global exception handler */
@@ -103,21 +104,23 @@ sealed trait AppTrait extends ExceptionHandling with RejectionHandling with
     httpServer
   }
 
-  def stopHttpServer(httpServer: Future[Http.ServerBinding], session: Session): Unit = {
+  def stopHttpServer(httpServer: Future[Http.ServerBinding], session: Option[Session]): Unit = {
     logger.info("Shutting down HTTP server...")
     httpServer
       .flatMap(_.unbind()) // trigger unbinding from the port
       .onComplete { _ ⇒
       logger.info("HTTP server is down")
-      logger.info("Shutting down Cassandra database...")
-      shutDownCassandra(session) onComplete { _ =>
-        logger.info("Cassandra database is down, exit")
-        shutdownAndExit(0)
+      session foreach { cassandraSession =>
+        logger.info("Shutting down Cassandra database...")
+        shutDownCassandra(cassandraSession) onComplete { _ =>
+          logger.info("Cassandra database is down, exit")
+          shutdownAndExit(0)
+        }
       }
     }
   }
 
-  def startupApp(session: Session): Unit = {
+  def startupApp(session: Option[Session]): Unit = {
     /** Create other actors */
     val personsSupervisorActor: ActorRef = system.actorOf(PersonSupervisorActor(session),
       "personSupervisorActor")
@@ -139,16 +142,20 @@ sealed trait AppTrait extends ExceptionHandling with RejectionHandling with
 
 object PersonServiceBoot extends App with AppTrait {
 
-  startUpCassandra onComplete {
-    case Failure(th) =>
-      logger.error("Cassandra startup failed", th)
-      shutdownAndExit(1)
-    case Success(result) =>
-      result match {
-        case Left(th) =>
-          logger.error("Cannot get Cassandra session", th)
-          shutdownAndExit(2)
-        case Right(session) => startupApp(session)
-      }
+  if (isNoSQL) {
+    startUpCassandra onComplete {
+      case Failure(th) =>
+        logger.error("Cassandra startup failed", th)
+        shutdownAndExit(1)
+      case Success(result) =>
+        result match {
+          case Left(th) =>
+            logger.error("Cannot get Cassandra session", th)
+            shutdownAndExit(2)
+          case Right(session) => startupApp(Option(session))
+        }
+    }
+  } else {
+    startupApp(None)
   }
 }

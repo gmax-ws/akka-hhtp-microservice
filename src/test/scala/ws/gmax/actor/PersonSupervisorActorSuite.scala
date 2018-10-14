@@ -26,7 +26,7 @@ class PersonSupervisorActorSuite extends TestKit(ActorSystem("person-services"))
   val person = Person(1, "John", "New York", 23)
 
   private val personSupervisorActor: ActorRef = system.actorOf(Props(
-    new PersonSupervisorActor(mockedSession) {
+    new PersonSupervisorActor(Option(mockedSession)) {
       override val personsActor = childActor.ref
     }
   ), "personSupervisorActor")
