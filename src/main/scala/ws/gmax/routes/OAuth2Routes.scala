@@ -26,7 +26,7 @@ trait OAuth2Routes extends OAuth2Protocol {
   self: PersonService =>
 
   val applicationId = "implicitFlow"
-  val expireIn: Long = FiniteDuration(90, TimeUnit.DAYS).toSeconds
+  val expireIn: Long = FiniteDuration(1, TimeUnit.HOURS).toSeconds
 
   val tokenType = "bearer"
   val scope = "person"
@@ -75,10 +75,3 @@ trait OAuth2Routes extends OAuth2Protocol {
     realm_id == realm && scope == scope && clients.contains(client_id)
   }
 }
-
-//POST https://api.authorization-server.com/token
-//grant_type=authorization_code&
-//code=AUTH_CODE_HERE&
-//redirect_uri=REDIRECT_URI&
-//client_id=CLIENT_ID&
-//client_secret=CLIENT_SECRET

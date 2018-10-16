@@ -27,7 +27,7 @@ trait EmbeddedCassandra {
     * @param dataSet optional data set
     * @return session
     */
-  def startUp(address: String = "localhost", port: Int = 9042, dataSet: Option[CQLDataSet] = None): Session = {
+  def startUp(address: String = "127.0.0.1", port: Int = 9042, dataSet: Option[CQLDataSet] = None): Session = {
     EmbeddedCassandraServerHelper.startEmbeddedCassandra(yamlFile, tmpDir)
     val cluster = Cluster.builder
       .addContactPoint(address).withPort(port)

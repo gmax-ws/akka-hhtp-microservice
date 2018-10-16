@@ -33,7 +33,7 @@ class PersonSupervisorActor(session: Option[Session]) extends AbstractSupervisor
   override def receive: Receive = {
     case message: GetPersonRequest => personsActor forward message
 
-    case message@GetPersonsRequest => personsActor forward message
+    case message: GetPersonsRequest.type => personsActor forward message
 
     case message: DeletePersonRequest => personsActor forward message
 
