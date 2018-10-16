@@ -12,6 +12,13 @@ $ sbt -Djava.library.path=native run
 $ sbt -Djava.library.path=native clean test
 ```
 
+For Windows OS use:
+```cmd
+> set JAVA_OPTS="-Dcom.datastax.driver.USE_NATIVE_CLOCK=false"
+> sbt clean assembly
+> sbt run
+> sbt clean test
+```
 Docker commands
 
 ```sh

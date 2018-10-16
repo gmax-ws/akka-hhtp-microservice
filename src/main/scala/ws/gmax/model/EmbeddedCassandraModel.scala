@@ -11,4 +11,4 @@ case class ShutdownCassandra(session: Session) extends CassandraMessage
 case class CassandraDataSet(dataSetLocation: String, keyspaceName: String,
                             keyspaceCreation: Boolean = true, keySpaceDeletion: Boolean = false)
 
-case class CassandraSettings(host: String = "localhost", port: Int = 9042, dataSet: CassandraDataSet)
+case class CassandraSettings(host: String = "127.0.0.1", port: Int = 9042, dataSet: CassandraDataSet)

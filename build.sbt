@@ -6,6 +6,8 @@ version := "0.1"
 
 scalaVersion := "2.12.7"
 
+test in assembly := {}
+
 val akkaVersion = "2.5.17"
 val akkaHttpVersion = "10.1.5"
 val cassandraDriverVersion = "3.6.0"
@@ -51,3 +53,15 @@ assemblyMergeStrategy in assembly := {
   case PathList("akka", "stream", xs@_*) => MergeStrategy.first
   case x => (assemblyMergeStrategy in assembly).value(x)
 }
+
+scalacOptions := Seq(
+  "-deprecation", // warning and location for usages of deprecated APIs
+  "-feature", // warning and location for usages of features that should be imported explicitly
+  "-language:implicitConversions", // Support for implicit conversions
+  "-unchecked", // additional warnings where generated code depends on assumptions
+  "-Xcheckinit", // runtime error when a val is not initialized due to trait hierarchies (instead of NPE somewhere else)
+  "-Ywarn-inaccessible",
+  "-Ywarn-dead-code"
+)
+
+scalacOptions in (Compile, doc) ++= Seq("-unchecked", "-deprecation", "-diagrams", "-implicits", "-skip-packages", "samples")

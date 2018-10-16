@@ -7,7 +7,7 @@ import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import spray.json.{DefaultJsonProtocol, RootJsonFormat}
-import ws.gmax.jwt.{AuthInfo, JwtToken}
+import ws.gmax.jwt.AuthInfo
 import ws.gmax.service.PersonService
 
 import scala.concurrent.duration.FiniteDuration
@@ -26,7 +26,7 @@ trait OAuth2Routes extends OAuth2Protocol {
   self: PersonService =>
 
   val applicationId = "implicitFlow"
-  val expireIn: Long = FiniteDuration(90, TimeUnit.DAYS).toSeconds
+  val expireIn: Long = FiniteDuration(1, TimeUnit.HOURS).toSeconds
 
   val tokenType = "bearer"
   val scope = "person"
