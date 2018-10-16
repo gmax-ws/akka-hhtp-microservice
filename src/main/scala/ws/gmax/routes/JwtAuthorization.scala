@@ -11,11 +11,13 @@ import ws.gmax.service.PersonService
 import scala.util.{Failure, Success}
 
 class TokenRoles(enabled: Boolean, roles: Roles) {
-  def hasAdminRole = if (enabled) roles.contains(ROLE_ADMIN) else true
+  private def hasRole(role: String) = if (enabled) roles.contains(role) else true
 
-  def hasReadRole = if (enabled) roles.contains(ROLE_READ) else true
+  def hasAdminRole = hasRole(ROLE_ADMIN)
 
-  def hasWriteRole = if (enabled) roles.contains(ROLE_WRITE) else true
+  def hasReadRole = hasRole(ROLE_READ)
+
+  def hasWriteRole = hasRole(ROLE_WRITE)
 }
 
 object TokenRoles {

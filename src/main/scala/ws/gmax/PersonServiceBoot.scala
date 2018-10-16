@@ -13,6 +13,7 @@ import akka.util.Timeout
 import com.datastax.driver.core.Session
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.LazyLogging
+import pdi.jwt.exceptions.JwtException
 import ws.gmax.Global._
 import ws.gmax.actor.{EmbeddedCassandraActor, PersonSupervisorActor}
 import ws.gmax.cors.Cors
@@ -42,6 +43,7 @@ object Global {
 sealed trait ExceptionHandling extends PersonJsonProtocol {
 
   val exceptionHandler = ExceptionHandler {
+    case ex: JwtException => complete((Unauthorized, SimpleResponse(ex.getMessage)))
     case th: Throwable => complete((InternalServerError, SimpleResponse(th.getMessage)))
   }
 }

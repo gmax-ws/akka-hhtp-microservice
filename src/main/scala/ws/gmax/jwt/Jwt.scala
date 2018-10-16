@@ -3,8 +3,9 @@ package ws.gmax.jwt
 import com.typesafe.scalalogging.LazyLogging
 import pdi.jwt.{Jwt, JwtAlgorithm, JwtClaim}
 import spray.json._
+import ws.gmax.jwt.JwtToken.Roles
 
-case class AuthInfo(iss: String, sub: String, authorization: Option[Set[String]])
+case class AuthInfo(iss: String, sub: String, authorization: Option[Roles])
 
 sealed trait Keys {
 
@@ -65,15 +66,13 @@ class JwtToken extends Keys with DefaultJsonProtocol with LazyLogging {
 
   implicit val authInfoFormat = jsonFormat3(AuthInfo)
 
-  def verifyToken(token: String, secret: String) =
+  def verifyToken(token: String, secret: String): Either[Throwable, AuthInfo] =
     Jwt.decode(token, secret, Seq(JwtAlgorithm.RS256)).map { decodedJson =>
       logger.info(s"Decoded json token $decodedJson")
       decodedJson.parseJson.convertTo[AuthInfo]
     }.toEither
 
-  def validate(token: String) = {
-    verifyToken(token, publicKey)
-  }
+  def validate(token: String): Either[Throwable, AuthInfo] = verifyToken(token, publicKey)
 }
 
 object JwtToken {
@@ -84,7 +83,7 @@ object JwtToken {
   val ROLE_READ = "ROLE_READ"
   val ROLE_WRITE = "ROLE_WRITE"
 
-  def allRoles = Set(ROLE_ADMIN, ROLE_READ, ROLE_WRITE)
+  val allRoles = Set(ROLE_ADMIN, ROLE_READ, ROLE_WRITE)
 
   def apply(): JwtToken = new JwtToken()
 }
