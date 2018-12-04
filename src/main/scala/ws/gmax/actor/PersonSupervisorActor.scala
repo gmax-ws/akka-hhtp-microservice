@@ -1,6 +1,7 @@
 package ws.gmax.actor
 
 import akka.actor.{ActorRef, DeadLetter, Props, Terminated}
+import akka.routing.FromConfig
 import com.datastax.driver.core.Session
 import ws.gmax.model._
 import ws.gmax.repo.PersonRepo
@@ -12,7 +13,7 @@ class PersonSupervisorActor(session: Session) extends AbstractSupervisorActor {
   val personRepo = PersonRepo(session)
 
   /** Create actors */
-  val personsActor: ActorRef = context.actorOf(PersonActor(personRepo), "personActor")
+  val personsActor: ActorRef = context.actorOf(FromConfig.props(PersonActor(personRepo)), "personActor")
 
   val jwtActor: ActorRef = context.actorOf(Props[JwtActor], "jwtActor")
 
