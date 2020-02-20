@@ -4,25 +4,10 @@ import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import org.apache.http.HttpHeaders
-import ws.gmax.jwt.AuthInfo
-import ws.gmax.jwt.JwtToken._
+import ws.gmax.jwt._
 import ws.gmax.service.PersonService
 
 import scala.util.{Failure, Success}
-
-class TokenRoles(enabled: Boolean, roles: Roles) {
-  private def hasRole(role: String) = if (enabled) roles.contains(role) else true
-
-  def hasAdminRole = hasRole(ROLE_ADMIN)
-
-  def hasReadRole = hasRole(ROLE_READ)
-
-  def hasWriteRole = hasRole(ROLE_WRITE)
-}
-
-object TokenRoles {
-  def apply(enabled: Boolean, roles: Roles): TokenRoles = new TokenRoles(enabled, roles)
-}
 
 trait JwtAuthorization {
   self: PersonService =>

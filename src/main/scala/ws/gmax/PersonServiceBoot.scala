@@ -1,20 +1,14 @@
 package ws.gmax
 
-import java.util.concurrent.TimeUnit
-
-import akka.actor.{ActorRef, ActorSystem}
+import akka.actor.ActorRef
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server._
 import akka.pattern._
-import akka.stream.ActorMaterializer
-import akka.util.Timeout
 import com.datastax.driver.core.Session
-import com.typesafe.config.Config
 import com.typesafe.scalalogging.LazyLogging
 import pdi.jwt.exceptions.JwtException
-import ws.gmax.Global._
 import ws.gmax.actor.{EmbeddedCassandraActor, PersonSupervisorActor}
 import ws.gmax.cors.Cors
 import ws.gmax.model._
@@ -22,27 +16,14 @@ import ws.gmax.routes.{PersonJsonProtocol, PersonRejection, PersonServiceRoutes,
 import ws.gmax.service.PersonService
 import ws.gmax.swagger.SwaggerDoc
 
-import scala.concurrent.{ExecutionContextExecutor, Future}
+import scala.concurrent.Future
 import scala.io.StdIn
 import scala.util.{Failure, Success}
-
-/** Global settings */
-object Global {
-  implicit val system: ActorSystem = ActorSystem("person-services")
-  implicit val executionContext: ExecutionContextExecutor = system.dispatcher
-  implicit val materializer: ActorMaterializer = ActorMaterializer()
-  implicit val timeout: Timeout = Timeout(30, TimeUnit.SECONDS)
-
-  val config: Config = system.settings.config.getConfig("app")
-  val port: Int = config.getInt("http-port")
-  val withCorsFilter: Boolean = config.getBoolean("withCorsFilter")
-  val localhostAuth: Boolean = config.getBoolean("localhostAuth")
-}
 
 /** Global exception handler */
 sealed trait ExceptionHandling extends PersonJsonProtocol {
 
-  val exceptionHandler = ExceptionHandler {
+  val exceptionHandler: ExceptionHandler = ExceptionHandler {
     case ex: JwtException => complete((Unauthorized, SimpleResponse(ex.getMessage)))
     case th: Throwable => complete((InternalServerError, SimpleResponse(th.getMessage)))
   }
@@ -99,8 +80,8 @@ sealed trait AppTrait extends ExceptionHandling with RejectionHandling with
   }
 
   def startHttpServer(routes: Route): Future[Http.ServerBinding] = {
-    val httpServer = Http().bindAndHandle(routes, "0.0.0.0", Global.port)
-    println(s"HTTP server is ready http://localhost:${Global.port}/${system.name}/swagger")
+    val httpServer = Http().bindAndHandle(routes, "0.0.0.0", port)
+    println(s"HTTP server is ready http://localhost:$port/${system.name}/swagger")
     println("Press RETURN to stop...")
     httpServer
   }

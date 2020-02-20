@@ -4,9 +4,9 @@ import akka.actor.ActorRef
 import akka.http.scaladsl.server.Directives.{pathPrefix, _}
 import akka.http.scaladsl.server.Route
 import akka.pattern.ask
-import ws.gmax.Global._
 import ws.gmax.model._
 import ws.gmax.routes.{OAuth2Routes, PersonServiceRoutes}
+import ws.gmax._
 
 import scala.concurrent.Future
 

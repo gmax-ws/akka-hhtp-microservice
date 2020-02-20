@@ -5,38 +5,24 @@ import java.security._
 import com.google.common.base.Splitter
 import org.bouncycastle.util.encoders.Base64
 
-trait KeyGenerator {
-  private val keyGen: KeyPairGenerator = KeyPairGenerator.getInstance("RSA")
+object Pem {
 
-  private val random: SecureRandom = SecureRandom.getInstance("SHA1PRNG", "SUN")
-  keyGen.initialize(1024, random)
-  private val pair: KeyPair = keyGen.generateKeyPair
+  val pair: KeyPair = generateKeyPair()
 
-  protected val privateKey: PrivateKey = pair.getPrivate
-  protected val publicKey: PublicKey = pair.getPublic
-}
+  def getPem(publicKey: Boolean = true): String = {
 
-object Pem extends KeyGenerator {
-  private val begPrivate = "-----BEGIN PRIVATE KEY-----\n"
-  private val endPrivate = "-----END PRIVATE KEY-----\n"
+    def encodePem(key: Key, beg: String, end: String) = {
+      val pem = new StringBuffer(beg)
+      val base64encoded = Base64.toBase64String(key.getEncoded)
+      Splitter.fixedLength(64).split(base64encoded).forEach(t => pem.append(s"$t\n"))
+      pem.append(end)
+      pem.toString
+    }
 
-  private val begPublic = "-----BEGIN PUBLIC KEY-----\n"
-  private val endPublic = "-----END PUBLIC KEY-----\n"
-
-  private def encodePem(key: Key, beg: String, end: String) = {
-    val base64encoded = Base64.toBase64String(key.getEncoded)
-    val lines = Splitter.fixedLength(64).split(base64encoded)
-    val pem = new StringBuffer(beg)
-    lines.forEach(t => pem.append(s"$t\n"))
-    pem.append(end)
-    pem.toString
-  }
-
-  def getPem(public: Boolean = true): String = {
-    if (public)
-      encodePem(publicKey, begPublic, endPublic)
+    if (publicKey)
+      encodePem(pair.getPublic, begPublic, endPublic)
     else
-      encodePem(privateKey, begPrivate, endPrivate)
+      encodePem(pair.getPrivate, begPrivate, endPrivate)
   }
 
 //  def main(args: Array[String]): Unit = {

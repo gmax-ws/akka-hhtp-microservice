@@ -1,33 +1,10 @@
 package ws.gmax.repo
 
 import com.datastax.driver.core.{Row, Session}
-import com.google.common.util.concurrent.{FutureCallback, Futures, ListenableFuture}
 import ws.gmax.model._
 
 import scala.collection.JavaConverters._
-import scala.concurrent.{ExecutionContext, Future, Promise}
-
-abstract class Java2ScalaFuture(isAsync: Boolean) {
-
-  implicit class RichListenableFuture[ResultSet](lf: ListenableFuture[ResultSet]) {
-
-    def asScalaFuture: Future[ResultSet] = {
-      if (isAsync) {
-        val p = Promise[ResultSet]()
-
-        Futures.addCallback(lf, new FutureCallback[ResultSet] {
-          def onFailure(ex: Throwable): Unit = p failure ex
-
-          def onSuccess(result: ResultSet): Unit = p success result
-        })
-
-        p.future
-      } else {
-        Future.successful(lf.get)
-      }
-    }
-  }
-}
+import scala.concurrent.{ExecutionContext, Future}
 
 class PersonRepo(session: Session, isAsync: Boolean)(implicit ec: ExecutionContext) extends Java2ScalaFuture(isAsync) {
 
@@ -87,7 +64,7 @@ class PersonRepo(session: Session, isAsync: Boolean)(implicit ec: ExecutionConte
     }
   }
 
-  def toPerson(row: Row) = Person(row.getInt("id"),
+  def toPerson(row: Row): Person = Person(row.getInt("id"),
     row.getString("name"),
     row.getString("address"),
     row.getInt("age"))
